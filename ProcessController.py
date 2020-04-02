@@ -57,7 +57,7 @@ class ProcessController(object):
                 videoChecker.check(fa, device, model)
 
     def process(self):
-
+        
         rawVideoDir = "/content/drive/My Drive/dataset/video/raw/"
         self.loadAll(rawVideoDir)
         print("Loaded, trimming!")
