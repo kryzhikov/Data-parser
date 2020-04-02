@@ -1,6 +1,7 @@
 import shutil
 
 from tqdm import tqdm
+import cv2
 
 from ffe import *
 
