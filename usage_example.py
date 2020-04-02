@@ -1,4 +1,4 @@
 from ProcessController import *
 
-controller = ProcessController()
+controller = ProcessController(loadList = "/content/Data-parser/LoadList.csv")
 controller.process()
