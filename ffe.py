@@ -1,6 +1,7 @@
 from __future__ import division
 
 import collections
+from skimage.transform import resize
 
 import face_alignment
 from facenet_pytorch import fixed_image_standardization
