@@ -144,7 +144,7 @@ def find_face_on_image(faces, target, image, title = "1.jpg"):
     dists = dist_in_list([face.getVector() for face in faces], target)
     face_boxes = [face.box_m for face in faces]
     ans = [0 for _ in range(len(dists))]
-    font = ImageFont.truetype("arial_bold_italic.ttf", 8)
+    font = ImageFont.truetype("/content/Data-parser/arial_bold_italic.ttf", 8)
     ans[np.argmax(dists)] = 1 if max(dists) >= 0.6 else 0
     for i in range(len(faces)):
         img_draw.rectangle(face_boxes[i], width=4,
