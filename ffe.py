@@ -27,7 +27,7 @@ pred_types = {'face': pred_type(slice(0, 17), (0.682, 0.780, 0.909, 0.5), 'blue'
 
 
 class Face(object):
-    def __init__(self, faceImage, box, box_m, sourceImage, fa = None, label=None, device = None, transforms_ = None):
+    def __init__(self, faceImage, box, box_m, sourceImage, fa = None, label=None, device = None, transforms_ = None, KP_d = None):
         self.faceImage = faceImage
         self.box = box
         self.box_m = box_m
@@ -54,9 +54,9 @@ class Face(object):
         self.globallms3d = np.array([[p[0] + self.box_m[0], p[1] + self.box_m[1], p[2]] for p in lms])
 
         self.globallms2d = np.array([[p[0] + self.box_m[0], p[1] + self.box_m[1]]for p in lms])
-
-
-
+        s = resize(self.imgCv2, (256, 256))[..., :3]
+        s = torch.tensor(s[np.newaxis].astype(np.float32)).permute(0, 3, 1, 2)
+        self.kp_source = KP_d(s)
 
     def showImg(self):
         imshow(image=self.faceTensor, title=self.label)
@@ -124,7 +124,7 @@ class Face(object):
 
 
 class ParsableImage():
-    def __init__(self, sourceImage, device: object = None, name: str = "best_photo", face_al = None):
+    def __init__(self, sourceImage, device: object = None, name: str = "best_photo", face_al = None, KP_d=None):
         self.sourceImage= sourceImage
         self.PILImage = Image.fromarray(self.sourceImage)
         self.device = torch.device(
@@ -135,6 +135,7 @@ class ParsableImage():
         self.faceBoxes = []
         self.faces = []
         self.parsedImage = self.PILImage.copy()
+        self.KP_d = KP_d
 
     def parseFaces(self, margin, model = None) -> object:
         faceImages, self.faceBoxes, self.faceBoxes_margined = extract_faces(self.sourceImage, self.fa, margin = margin)
@@ -142,7 +143,7 @@ class ParsableImage():
         if faceImages is None or len(faceImages) == 0 :
             return None
         for i, b, b_m in (zip(faceImages, self.faceBoxes, self.faceBoxes_margined)):
-            tmpFace = Face(i, b, b_m, self.PILImage, self.fa, device=self.device)
+            tmpFace = Face(i, b, b_m, self.PILImage, self.fa, device=self.device, KP_d = self.KP_d)
             if model is not None:
                 tmpFace.setModel(model)
                 tmpFace.buildVec(tensor = True)

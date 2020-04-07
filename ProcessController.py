@@ -8,6 +8,7 @@ from facenet_pytorch.models.inception_resnet_v1 import InceptionResnetV1
 from VideoChecker import VideoChecker
 from VideoLoader import VideoLoader
 from VideoTrimmer import VideoTrimmer
+from utils import load_checkpoints
 
 
 # class to wrap workflow
@@ -45,7 +46,8 @@ class ProcessController(object):
         device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
         model = InceptionResnetV1(pretrained='vggface2').eval()
         device_str = 'cpu' if device == torch.device('cpu') else 'cuda:0'
-
+        kp_detector = load_checkpoints(config_path='vox-256.yaml',
+                            checkpoint_path='/content/gdrive/My Drive/first-order-motion-model/vox-cpk.pth.tar')
         fa = face_alignment.FaceAlignment(face_alignment.LandmarksType._3D, device=device_str)
         raw_dir_path = rawVideoDir
         raw_dir = os.listdir(raw_dir_path)
@@ -54,10 +56,10 @@ class ProcessController(object):
             if path.count(".mp4") == 0:
                 check_dir = path
                 videoChecker = VideoChecker(check_dir)
-                videoChecker.check(fa, device, model)
+                videoChecker.check(fa, device, model, KP_d=kp_detector)
 
     def process(self):
-        
+
         rawVideoDir = "/content/drive/My Drive/dataset/video/raw/"
         self.loadAll(rawVideoDir)
         print("Loaded, trimming!")

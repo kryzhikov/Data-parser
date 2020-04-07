@@ -1,12 +1,19 @@
-import os
-
-import numpy as np
-import cv2
-import torch
+import matplotlib
 from PIL import ImageDraw, Image
 from PIL import ImageFont
 from matplotlib import pyplot as plt
+
+matplotlib.use('Agg')
+import os
+import yaml
+
+import numpy as np
+import torch
+from sync_batchnorm import DataParallelWithCallback
+
+from KP_Detector import KPDetector
 from sklearn.metrics import pairwise_distances
+
 
 class_name = ("Blue", "Blue Gray", "Brown", "Brown Gray",
               "Brown Black", "Green", "Green Gray", "Other")
@@ -19,6 +26,29 @@ EyeColor = {
     class_name[5]: ((60, 21, 50), (165, 100, 85)),
     class_name[6]: ((60, 2, 25), (165, 20, 65))
 }
+
+
+def load_checkpoints(config_path, checkpoint_path, cpu=False):
+    with open(config_path) as f:
+        config = yaml.load(f)
+
+    kp_detector = KPDetector(**config['model_params']['kp_detector_params'],
+                             **config['model_params']['common_params'])
+    if not cpu:
+        kp_detector.cuda()
+
+    if cpu:
+        checkpoint = torch.load(checkpoint_path, map_location=torch.device('cpu'))
+    else:
+        checkpoint = torch.load(checkpoint_path)
+    kp_detector.load_state_dict(checkpoint['kp_detector'])
+
+    if not cpu:
+        kp_detector = DataParallelWithCallback(kp_detector)
+
+    kp_detector.eval()
+
+    return   kp_detector
 
 def pretty_size(size):
     """Pretty prints a torch.Size object"""
@@ -114,7 +144,7 @@ def find_face_on_image(faces, target, image, title = "1.jpg"):
     dists = dist_in_list([face.getVector() for face in faces], target)
     face_boxes = [face.box_m for face in faces]
     ans = [0 for _ in range(len(dists))]
-    font = ImageFont.truetype("/content/Data-parser/arial_bold_italic.ttf", 8)
+    font = ImageFont.truetype("arial_bold_italic.ttf", 8)
     ans[np.argmax(dists)] = 1 if max(dists) >= 0.6 else 0
     for i in range(len(faces)):
         img_draw.rectangle(face_boxes[i], width=4,
