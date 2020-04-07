@@ -60,7 +60,7 @@ class ProcessController(object):
 
     def process(self):
 
-        rawVideoDir = "/content/drive/My Drive/dataset/video/raw/"
+        rawVideoDir = "/content/gdrive/My Drive/dataset/video/raw/"
         self.loadAll(rawVideoDir)
         print("Loaded, trimming!")
         self.trimAll(rawVideoDir)
