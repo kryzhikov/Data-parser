@@ -46,7 +46,7 @@ class ProcessController(object):
         device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
         model = InceptionResnetV1(pretrained='vggface2').eval()
         device_str = 'cpu' if device == torch.device('cpu') else 'cuda:0'
-        kp_detector = load_checkpoints(config_path='vox-256.yaml',
+        kp_detector = load_checkpoints(config_path='/content/Data-parser/vox-256.yaml',
                             checkpoint_path='/content/gdrive/My Drive/first-order-motion-model/vox-cpk.pth.tar')
         fa = face_alignment.FaceAlignment(face_alignment.LandmarksType._3D, device=device_str)
         raw_dir_path = rawVideoDir
