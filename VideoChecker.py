@@ -98,7 +98,7 @@ class VideoChecker(object):
 
                 cur_v.faceImage.save(self.directory + "/" + file[:-4] + "/" + str(idx) + ".jpg")
                 im_p.showBoxes()
-                im_p.parsedImage.save(f"./{file}_sample.jpg")
+                #im_p.parsedImage.save(f"./{file}_sample.jpg")
                 np.save(self.directory + "/" + file[:-4] + "/2D" + str(idx), cur_v.lms2d)
                 np.save(self.directory + "/" + file[:-4] + "/3D" + str(idx), cur_v.lms3d)
                 torch.save(cur_v.kp_source, self.directory + "/" + file[:-4] + "/KP_D" + str(idx))
