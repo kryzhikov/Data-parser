@@ -4,6 +4,8 @@ import cv2
 from tqdm import tqdm
 
 from ffe import *
+import skvideo.io
+from cv2 import VideoWriter, VideoWriter_fourcc
 
 
 # __init__ get a path to directory to examine
@@ -66,7 +68,7 @@ class VideoChecker(object):
             #             im_p.faces[0].faceImage.save(self.directory + "/" + file[:-4] + "/" + str(0) + ".jpg")
             im_p.showBoxes()
             im_p.parsedImage.save(f"./{file}_Debug.jpg")
-            frames = [im_p.faces[0].imgCv2]
+            frames =[ cv2.resize(im_p.faces[0].imgCv2, (256, 256))[:, :, ::-1]]
             dres2 = []
             dres3 = []
             KP_D = []
@@ -104,7 +106,7 @@ class VideoChecker(object):
                     correctFile = False
                     break
 
-                frames.append(cur_v.imgCv2)
+                frames.append(cv2.resize(cur_v.imgCv2, (256, 256))[:, :, ::-1])
                 im_p.showBoxes()
                 # im_p.parsedImage.save(f"./{file}_sample.jpg")
                 #                 np.save(self.directory + "/" + file[:-4] + "/2D" + str(idx), cur_v.lms2d)
@@ -127,6 +129,14 @@ class VideoChecker(object):
                 # dump_tensors()
                 pbar.update(1)
             pbar.close()
+            torch.save(KP_D, self.directory + "/" + file[:-4] + "/KP_D.pt")
+            print(np.array(frames).shape)
+            fourcc = VideoWriter_fourcc(*'MP42')
+            video = VideoWriter(self.directory + "/" + file[:-4] + "/speaker.avi", fourcc, float(25), (256, 256))
+            for i in frames:
+                  video.write(i)
+            video.release()
+            #skvideo.io.vwrite(self.directory + "/" + file[:-4] + "/video.mp4", np.array(frames))
             np.save(self.directory + "/" + file[:-4] + "/2DFull.npy", np.array(dres2))
             np.save(self.directory + "/" + file[:-4] + "/3DFull.npy", np.array(dres3))
             np.save(self.directory + "/" + file[:-4] + "/frames.npy", np.array(frames))
