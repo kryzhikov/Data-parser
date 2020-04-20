@@ -62,12 +62,19 @@ class VideoChecker(object):
             else:
                 prev_v = im_p.faces[0].getVector()
 
-            im_p.faces[0].faceImage.save(self.directory + "/" + file[:-4] + "/" + str(0) + ".jpg")
+#             im_p.faces[0].faceImage.save(self.directory + "/" + file[:-4] + "/" + str(0) + ".jpg")
             im_p.showBoxes()
-            im_p.parsedImage.save(f"./{file}_Debug.jpg")
-            np.save(self.directory + "/" + file[:-4] + "/2D" + str(0), im_p.faces[0].lms2d)
-            np.save(self.directory + "/" + file[:-4] + "/3D" + str(0), im_p.faces[0].lms3d)
-            torch.save(im_p.faces[0].kp_source, self.directory + "/" + file[:-4] + "/KP_D" + str(0))
+            im_p.parsedImage.save(f"./{file}_Debug.jpg"
+            frames = [im_p.faces[0].imgCv2]
+            2dres = []
+            3dres = []
+            KP_D = []
+#             np.save(self.directory + "/" + file[:-4] + "/2D" + str(0), im_p.faces[0].lms2d)
+#             np.save(self.directory + "/" + file[:-4] + "/3D" + str(0), im_p.faces[0].lms3d)
+            2dres.append(im_p.faces[0].lms2d)
+            3dres.append( im_p.faces[0].lms3d)
+#             torch.save(im_p.faces[0].kp_source, self.directory + "/" + file[:-4] + "/KP_D" + str(0))
+            KP_D.append(im_p.faces[0].kp_source)
             idx = 1
             length = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
             pbar = tqdm(total=length + 1)
@@ -96,12 +103,16 @@ class VideoChecker(object):
                     correctFile = False
                     break
 
-                cur_v.faceImage.save(self.directory + "/" + file[:-4] + "/" + str(idx) + ".jpg")
+                frames.append(cur_v.imgCv2)
                 im_p.showBoxes()
                 #im_p.parsedImage.save(f"./{file}_sample.jpg")
-                np.save(self.directory + "/" + file[:-4] + "/2D" + str(idx), cur_v.lms2d)
-                np.save(self.directory + "/" + file[:-4] + "/3D" + str(idx), cur_v.lms3d)
-                torch.save(cur_v.kp_source, self.directory + "/" + file[:-4] + "/KP_D" + str(idx))
+#                 np.save(self.directory + "/" + file[:-4] + "/2D" + str(idx), cur_v.lms2d)
+#                 np.save(self.directory + "/" + file[:-4] + "/3D" + str(idx), cur_v.lms3d)
+                2dres.append(cur_v.lms2d)
+                3dres.append(cur_v.lms3d)
+#                 torch.save(cur_v.kp_source, self.directory + "/" + file[:-4] + "/KP_D" + str(idx))
+                KP_D.append(cur_v.kp_source)
+
                 if debug:
                     tmp = cur_v.faceImage.copy()
                     imageD = ImageDraw.Draw(tmp)
@@ -114,8 +125,14 @@ class VideoChecker(object):
                 del cur_v
                 # dump_tensors()
                 pbar.update(1)
+            height, width, layers = frames[0].shape
+
+            video = cv2.VideoWriter(video_name, 0, 1, (width,height))
 
             pbar.close()
+            np.save(self.directory + "/" + file[:-4] + "/2DFull.npy",np.array(2dres)) 
+            np.save(self.directory + "/" + file[:-4] + "/3DFull.npy",np.array(3dres))
+            
             print("CORRECT?", correctFile)
             print("FNAME", file)
             cap.release()
