@@ -14,7 +14,7 @@ class VideoChecker(object):
     def __init__(self, directory):
         self.directory = directory
 
-    def check(self, fa, device=None, model=None, debug=False, KP_d = None):
+    def check(self, fa, device=None, model=None, debug=False, KP_d=None):
         '''
             Предполагаем, что на первом кадре всегда искомый спикер
             Берём его лицо как таргет
@@ -46,7 +46,8 @@ class VideoChecker(object):
                 continue
             try:
                 im = Image.fromarray(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB))
-                im_p = ParsableImage(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB), device=device, name=file, face_al=fa, KP_d = KP_d)
+                im_p = ParsableImage(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB), device=device, name=file, face_al=fa,
+                                     KP_d=KP_d)
                 im_p.parseFaces(margin=60, model=model)
             except Exception as ex:
                 print("BROKEN VIDEO cant read imge ", ex)
@@ -62,18 +63,18 @@ class VideoChecker(object):
             else:
                 prev_v = im_p.faces[0].getVector()
 
-#             im_p.faces[0].faceImage.save(self.directory + "/" + file[:-4] + "/" + str(0) + ".jpg")
+            #             im_p.faces[0].faceImage.save(self.directory + "/" + file[:-4] + "/" + str(0) + ".jpg")
             im_p.showBoxes()
-            im_p.parsedImage.save(f"./{file}_Debug.jpg"
+            im_p.parsedImage.save(f"./{file}_Debug.jpg")
             frames = [im_p.faces[0].imgCv2]
-            2dres = []
-            3dres = []
+            dres2 = []
+            dres3 = []
             KP_D = []
-#             np.save(self.directory + "/" + file[:-4] + "/2D" + str(0), im_p.faces[0].lms2d)
-#             np.save(self.directory + "/" + file[:-4] + "/3D" + str(0), im_p.faces[0].lms3d)
-            2dres.append(im_p.faces[0].lms2d)
-            3dres.append( im_p.faces[0].lms3d)
-#             torch.save(im_p.faces[0].kp_source, self.directory + "/" + file[:-4] + "/KP_D" + str(0))
+            #             np.save(self.directory + "/" + file[:-4] + "/2D" + str(0), im_p.faces[0].lms2d)
+            #             np.save(self.directory + "/" + file[:-4] + "/3D" + str(0), im_p.faces[0].lms3d)
+            dres2.append(im_p.faces[0].lms2d)
+            dres3.append(im_p.faces[0].lms3d)
+            #             torch.save(im_p.faces[0].kp_source, self.directory + "/" + file[:-4] + "/KP_D" + str(0))
             KP_D.append(im_p.faces[0].kp_source)
             idx = 1
             length = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
@@ -84,7 +85,7 @@ class VideoChecker(object):
                     print("BROKEN VIDEO not ret")
                     break
                 try:
-                    im_p = ParsableImage(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB), device, file, face_al=fa, KP_d = KP_d)
+                    im_p = ParsableImage(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB), device, file, face_al=fa, KP_d=KP_d)
                     im_p.parseFaces(margin=60, model=model)
                 except Exception as ex:
                     print(f"[ERROR] Can't find faces on image  Cant Parse cause of {ex}")
@@ -105,12 +106,12 @@ class VideoChecker(object):
 
                 frames.append(cur_v.imgCv2)
                 im_p.showBoxes()
-                #im_p.parsedImage.save(f"./{file}_sample.jpg")
-#                 np.save(self.directory + "/" + file[:-4] + "/2D" + str(idx), cur_v.lms2d)
-#                 np.save(self.directory + "/" + file[:-4] + "/3D" + str(idx), cur_v.lms3d)
-                2dres.append(cur_v.lms2d)
-                3dres.append(cur_v.lms3d)
-#                 torch.save(cur_v.kp_source, self.directory + "/" + file[:-4] + "/KP_D" + str(idx))
+                # im_p.parsedImage.save(f"./{file}_sample.jpg")
+                #                 np.save(self.directory + "/" + file[:-4] + "/2D" + str(idx), cur_v.lms2d)
+                #                 np.save(self.directory + "/" + file[:-4] + "/3D" + str(idx), cur_v.lms3d)
+                dres2.append(cur_v.lms2d)
+                dres3.append(cur_v.lms3d)
+                #                 torch.save(cur_v.kp_source, self.directory + "/" + file[:-4] + "/KP_D" + str(idx))
                 KP_D.append(cur_v.kp_source)
 
                 if debug:
@@ -126,13 +127,14 @@ class VideoChecker(object):
                 # dump_tensors()
                 pbar.update(1)
             height, width, layers = frames[0].shape
-
-            video = cv2.VideoWriter(video_name, 0, 1, (width,height))
-
+            video = cv2.VideoWriter(self.directory + "/" + file[:-4] + "/speaker.mp4", -1, 1, (width, height))
+            for i in frames:
+                video.write(i)
+            cv2.destroyAllWindows()
+            video.release()
             pbar.close()
-            np.save(self.directory + "/" + file[:-4] + "/2DFull.npy",np.array(2dres)) 
-            np.save(self.directory + "/" + file[:-4] + "/3DFull.npy",np.array(3dres))
-            
+            np.save(self.directory + "/" + file[:-4] + "/2DFull.npy", np.array(dres2))
+            np.save(self.directory + "/" + file[:-4] + "/3DFull.npy", np.array(dres3))
             print("CORRECT?", correctFile)
             print("FNAME", file)
             cap.release()
