@@ -134,7 +134,7 @@ class VideoChecker(object):
             fourcc = VideoWriter_fourcc(*'MP42')
             video = VideoWriter(self.directory + "/" + file[:-4] + "/speaker.avi", fourcc, float(25), (256, 256))
             for i in frames:
-                  video.write(i)
+                  video.write(i[:, :, ::-1])
             video.release()
             #skvideo.io.vwrite(self.directory + "/" + file[:-4] + "/video.mp4", np.array(frames))
             np.save(self.directory + "/" + file[:-4] + "/2DFull.npy", np.array(dres2))
