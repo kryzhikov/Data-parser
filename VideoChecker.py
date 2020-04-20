@@ -126,15 +126,10 @@ class VideoChecker(object):
                 del cur_v
                 # dump_tensors()
                 pbar.update(1)
-            height, width, layers = frames[0].shape
-            video = cv2.VideoWriter(self.directory + "/" + file[:-4] + "/speaker.mp4", -1, 1, (width, height))
-            for i in frames:
-                video.write(i)
-            cv2.destroyAllWindows()
-            video.release()
             pbar.close()
             np.save(self.directory + "/" + file[:-4] + "/2DFull.npy", np.array(dres2))
             np.save(self.directory + "/" + file[:-4] + "/3DFull.npy", np.array(dres3))
+            np.save(self.directory + "/" + file[:-4] + "/frames.npy", np.array(frames))
             print("CORRECT?", correctFile)
             print("FNAME", file)
             cap.release()
