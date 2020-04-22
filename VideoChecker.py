@@ -142,7 +142,7 @@ class VideoChecker(object):
             np.save(self.directory + "/" + file[:-4] + "/2DFull.npy", np.array(dres2))
             np.save(self.directory + "/" + file[:-4] + "/3DFull.npy", np.array(dres3))
             np.save(self.directory + "/" + file[:-4] + "/frames.npy", np.array(frames))
-            np.sace(self.directory + "/" + file[:-4] + "/BB.npy", np.array(BB))
+            np.save(self.directory + "/" + file[:-4] + "/BB.npy", np.array(BB))
             os.copy(self.directory + "/" + file[:-4]+".txt", self.directory + "/" + file[:-4]+"/subs.txt")
             print("CORRECT?", correctFile)
             print("FNAME", file)
