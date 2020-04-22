@@ -48,7 +48,7 @@ class ProcessController(object):
         device_str = 'cpu' if device == torch.device('cpu') else 'cuda:0'
 #         kp_detector = load_checkpoints(config_path='/content/Data-parser/vox-256.yaml',
 #                             checkpoint_path='/content/gdrive/My Drive/first-order-motion-model/vox-cpk.pth.tar')
-        fa = face_alignment.FaceAlignment(face_alignment.LandmarksType._3D, device=device_str)
+        fa = face_alignment.FaceAlignment(face_alignment.LandmarksType._3D, device='cuda:0')
         raw_dir_path = rawVideoDir
         raw_dir = os.listdir(raw_dir_path)
         for elem in raw_dir:
