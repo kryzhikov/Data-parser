@@ -82,14 +82,20 @@ class VideoChecker(object):
             idx = 1
             length = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
             pbar = tqdm(total=length + 1)
+            check_interval = 10
             while cap.isOpened():
                 ret, frame = cap.read()
                 if not ret:
                     print("BROKEN VIDEO not ret")
                     break
+                
                 try:
                     im_p = ParsableImage(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB), device, file, face_al=fa, KP_d=KP_d)
-                    im_p.parseFaces(margin=60, model=model)
+                    if idx % check_interval == 0:
+                        im_p.parseFaces(margin=60, model=model)
+                    else:
+                        im_p.parseFaces(margin=60, model=None)
+                        
                 except Exception as ex:
                     print(f"[ERROR] Can't find faces on image  Cant Parse cause of {ex}")
                     im_p.PILImage.save(f"{file}WHAT?.jpg")
@@ -100,12 +106,17 @@ class VideoChecker(object):
                     print(f"[ERROR] Can't find faces on image ! No faces")
                     correctFile = False
                     break
-                cur_v = find_face_on_image(im_p.faces, prev_v, im_p.PILImage, file)
+                if idx % check_interval == 0:
+                    
+                
+                    cur_v = find_face_on_image(im_p.faces, prev_v, im_p.PILImage, file)
 
-                if cur_v is None:
-                    print(f"[ERROR] Can't find speaker face on image ! Speaker not found")
-                    correctFile = False
-                    break
+                    if cur_v is None:
+                        print(f"[ERROR] Can't find speaker face on image ! Speaker not found")
+                        correctFile = False
+                        break
+                else:
+                    cur_v = im_p.faces[0]
 
                 frames.append(cv2.resize(cur_v.imgCv2, (256, 256))[:, :, ::-1])
 #                 im_p.showBoxes()
