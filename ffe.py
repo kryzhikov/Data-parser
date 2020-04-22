@@ -55,9 +55,9 @@ class Face(object):
         self.globallms3d = np.array([[p[0] + self.box_m[0], p[1] + self.box_m[1], p[2]] for p in lms])
 
         self.globallms2d = np.array([[p[0] + self.box_m[0], p[1] + self.box_m[1]]for p in lms])
-        s = resize(self.imgCv2, (256, 256))[..., :3]
-        s = torch.tensor(s[np.newaxis].astype(np.float32)).permute(0, 3, 1, 2)
-        self.kp_source = KP_d(s)
+#         s = resize(self.imgCv2, (256, 256))[..., :3]
+#         s = torch.tensor(s[np.newaxis].astype(np.float32)).permute(0, 3, 1, 2)
+#         self.kp_source = KP_d(s)
 
     def showImg(self):
         imshow(image=self.faceTensor, title=self.label)
