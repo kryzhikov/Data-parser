@@ -77,7 +77,7 @@ class VideoChecker(object):
             dres2.append(im_p.faces[0].lms2d)
             dres3.append(im_p.faces[0].lms3d)
             #             torch.save(im_p.faces[0].kp_source, self.directory + "/" + file[:-4] + "/KP_D" + str(0))
-            KP_D.append(im_p.faces[0].kp_source)
+#             KP_D.append(im_p.faces[0].kp_source)
             idx = 1
             length = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
             pbar = tqdm(total=length + 1)
@@ -107,14 +107,14 @@ class VideoChecker(object):
                     break
 
                 frames.append(cv2.resize(cur_v.imgCv2, (256, 256))[:, :, ::-1])
-                im_p.showBoxes()
+#                 im_p.showBoxes()
                 # im_p.parsedImage.save(f"./{file}_sample.jpg")
                 #                 np.save(self.directory + "/" + file[:-4] + "/2D" + str(idx), cur_v.lms2d)
                 #                 np.save(self.directory + "/" + file[:-4] + "/3D" + str(idx), cur_v.lms3d)
                 dres2.append(cur_v.lms2d)
                 dres3.append(cur_v.lms3d)
                 #                 torch.save(cur_v.kp_source, self.directory + "/" + file[:-4] + "/KP_D" + str(idx))
-                KP_D.append(cur_v.kp_source)
+#                 KP_D.append(cur_v.kp_source)
 
                 if debug:
                     tmp = cur_v.faceImage.copy()
@@ -129,8 +129,8 @@ class VideoChecker(object):
                 # dump_tensors()
                 pbar.update(1)
             pbar.close()
-            torch.save(KP_D, self.directory + "/" + file[:-4] + "/KP_D.pt")
-            print(np.array(frames).shape)
+#             torch.save(KP_D, self.directory + "/" + file[:-4] + "/KP_D.pt")
+#             print(np.array(frames).shape)
             fourcc = VideoWriter_fourcc(*'MP42')
             video = VideoWriter(self.directory + "/" + file[:-4] + "/speaker.avi", fourcc, float(25), (256, 256))
             for i in frames:
