@@ -71,13 +71,14 @@ class VideoChecker(object):
             frames =[ cv2.resize(im_p.faces[0].imgCv2, (256, 256))[:, :, ::-1]]
             dres2 = []
             dres3 = []
-            KP_D = []
+            BB = []
             #             np.save(self.directory + "/" + file[:-4] + "/2D" + str(0), im_p.faces[0].lms2d)
             #             np.save(self.directory + "/" + file[:-4] + "/3D" + str(0), im_p.faces[0].lms3d)
             dres2.append(im_p.faces[0].lms2d)
             dres3.append(im_p.faces[0].lms3d)
             #             torch.save(im_p.faces[0].kp_source, self.directory + "/" + file[:-4] + "/KP_D" + str(0))
 #             KP_D.append(im_p.faces[0].kp_source)
+            BB.append(im_p.faces[0].box_m)
             idx = 1
             length = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
             pbar = tqdm(total=length + 1)
@@ -113,6 +114,7 @@ class VideoChecker(object):
                 #                 np.save(self.directory + "/" + file[:-4] + "/3D" + str(idx), cur_v.lms3d)
                 dres2.append(cur_v.lms2d)
                 dres3.append(cur_v.lms3d)
+                BB.append(cur_v.box_m)
                 #                 torch.save(cur_v.kp_source, self.directory + "/" + file[:-4] + "/KP_D" + str(idx))
 #                 KP_D.append(cur_v.kp_source)
 
@@ -140,6 +142,8 @@ class VideoChecker(object):
             np.save(self.directory + "/" + file[:-4] + "/2DFull.npy", np.array(dres2))
             np.save(self.directory + "/" + file[:-4] + "/3DFull.npy", np.array(dres3))
             np.save(self.directory + "/" + file[:-4] + "/frames.npy", np.array(frames))
+            np.sace(self.directory + "/" + file[:-4] + "/BB.npy", np.array(BB))
+            os.copy(self.directory + "/" + file[:-4]+".txt", self.directory + "/" + file[:-4]+"/subs.txt")
             print("CORRECT?", correctFile)
             print("FNAME", file)
             cap.release()
