@@ -137,7 +137,8 @@ class VideoChecker(object):
                         imageD.point((x, y), 'green')
                     tmp.save("DEBUG" + file.rstrip(".mp4") + ".jpg")
                 idx += 1
-                im_p.flush()
+                if idx % check_interval == 0:
+                    im_p.flush()
                 del cur_v
                 # dump_tensors()
                 pbar.update(1)
