@@ -31,12 +31,12 @@ class VideoChecker(object):
             print('=' * 20, f"processing {file}", "=" * 20)
             if ".DS_Store" in file or ".mp4" not in file:
                 continue
-            f_dir = self.directory + "/" + file[:-4] + "/"
-            if os.path.exists(f_dir):
+#             f_dir = self.directory + "/" + file[:-4] + "/"
+            if os.path.exists(self.directory + "/" + file[:-4]+"2DFull.npy"):
                 print("file already checked!")
                 continue
-            if not os.path.exists(self.directory + "/" + file[:-4] + "/"):
-                os.mkdir(self.directory + "/" + file[:-4] + "/")
+#             if not os.path.exists(self.directory + "/" + file[:-4] + "/"):
+#                 os.mkdir(self.directory + "/" + file[:-4] + "/")
 
             correctFile = True
             cap = cv2.VideoCapture(self.directory + "/" + file)
@@ -44,7 +44,6 @@ class VideoChecker(object):
             if not ret:
                 print("BROKEN VIDEO not ret")
                 os.remove(self.directory + "/" + file)
-                shutil.rmtree(f_dir)
                 continue
             try:
                 im = Image.fromarray(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB))
@@ -54,13 +53,11 @@ class VideoChecker(object):
             except Exception as ex:
                 print("BROKEN VIDEO cant read imge ", ex)
                 os.remove(self.directory + "/" + file)
-                shutil.rmtree(f_dir)
                 continue
 
             if im_p.faces is None or len(im_p.faces) == 0:
                 print(f"[ERROR] Can't find faces on image !")
                 os.remove(self.directory + "/" + file)
-                shutil.rmtree(f_dir)
                 continue
             else:
                 prev_v = im_p.faces[0].getVector()
@@ -152,16 +149,18 @@ class VideoChecker(object):
 #                   video.write(i[:, :, ::-1])
 #             video.release()
             #skvideo.io.vwrite(self.directory + "/" + file[:-4] + "/video.mp4", np.array(frames))
-            np.save(self.directory + "/" + file[:-4] + "/2DFull.npy", np.array(dres2))
-            np.save(self.directory + "/" + file[:-4] + "/3DFull.npy", np.array(dres3))
-#             np.save(self.directory + "/" + file[:-4] + "/frames.npy", np.array(frames))
-            np.save(self.directory + "/" + file[:-4] + "/BB.npy", np.array(BB))
-            shutil.copyfile(self.directory + "/" + file[:-4]+".txt", self.directory + "/" + file[:-4]+"/subs.txt")
-            shutil.copyfile(self.directory + "/" + file, self.directory + "/" + file[:-4]+"/speaket.mp4")
+            if not correctFile:
+                os.remove(self.directory + "/" + file)
+
+            else:
+                np.save(self.directory + "/" + file[:-4] + "_2DFull.npy", np.array(dres2))
+                np.save(self.directory + "/" + file[:-4] + "_3DFull.npy", np.array(dres3))
+        #             np.save(self.directory + "/" + file[:-4] + "/frames.npy", np.array(frames))
+                np.save(self.directory + "/" + file[:-4] + "_BB.npy", np.array(BB))
+        #             shutil.copyfile(self.directory + "/" + file[:-4]+".txt", self.directory + "/" + file[:-4]+"/subs.txt")
+        #             shutil.copyfile(self.directory + "/" + file, self.directory + "/" + file[:-4]+"/speaket.mp4")
             print("CORRECT?", correctFile)
             print("FNAME", file)
             cap.release()
             del prev_v
-            if not correctFile:
-                os.remove(self.directory + "/" + file)
-                shutil.rmtree(f_dir)
+            
