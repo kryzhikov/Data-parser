@@ -32,7 +32,7 @@ class VideoChecker(object):
             if ".DS_Store" in file or ".mp4" not in file:
                 continue
 #             f_dir = self.directory + "/" + file[:-4] + "/"
-            if os.path.exists(self.directory + "/" + file[:-4]+"2DFull.npy"):
+            if os.path.exists(self.directory + "/" + file[:-4]+"_2DFull.npy"):
                 print("file already checked!")
                 continue
 #             if not os.path.exists(self.directory + "/" + file[:-4] + "/"):
