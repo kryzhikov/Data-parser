@@ -55,7 +55,7 @@ class VideoChecker(object):
                 os.remove(self.directory + "/" + file)
                 continue
 
-            if im_p.faces is None or len(im_p.faces) == 0:
+            if im_p.faces is None or len(im_p.faces) == 0 or len(im_p.faces) > 1:
                 print(f"[ERROR] Can't find faces on image !")
                 os.remove(self.directory + "/" + file)
                 continue
