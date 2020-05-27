@@ -79,7 +79,7 @@ class VideoChecker(object):
             idx = 1
             length = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
             pbar = tqdm(total=length + 1)
-            check_interval = 15
+            check_interval = 1
             while cap.isOpened():
                 ret, frame = cap.read()
                 if not ret:
