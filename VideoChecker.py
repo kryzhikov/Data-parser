@@ -151,7 +151,7 @@ class VideoChecker(object):
             #skvideo.io.vwrite(self.directory + "/" + file[:-4] + "/video.mp4", np.array(frames))
             if not correctFile:
                 os.remove(self.directory + "/" + file)
-                os.remove(self.directory + "/" + file[:-4]+".txt")
+                #os.remove(self.directory + "/" + file[:-4]+".txt")
 
             else:
                 np.save(self.directory + "/" + file[:-4] + "_2DFull.npy", np.array(dres2))
