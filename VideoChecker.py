@@ -11,6 +11,30 @@ from cv2 import VideoWriter, VideoWriter_fourcc
 # __init__ get a path to directory to examine
 
 # TODO here we can also save detected faces
+def bb_intersection_over_union(boxA, boxB):
+    # determine the (x, y)-coordinates of the intersection rectangle
+    xA = max(boxA[0], boxB[0])
+    yA = max(boxA[1], boxB[1])
+    xB = min(boxA[2], boxB[2])
+    yB = min(boxA[3], boxB[3])
+
+    # compute the area of intersection rectangle
+    interArea = abs(max((xB - xA, 0)) * max((yB - yA), 0))
+    if interArea == 0:
+        return 0
+    # compute the area of both the prediction and ground-truth
+    # rectangles
+    boxAArea = abs((boxA[2] - boxA[0]) * (boxA[3] - boxA[1]))
+    boxBArea = abs((boxB[2] - boxB[0]) * (boxB[3] - boxB[1]))
+
+    # compute the intersection over union by taking the intersection
+    # area and dividing it by the sum of prediction + ground-truth
+    # areas - the interesection area
+    iou = interArea / float(boxAArea + boxBArea - interArea)
+
+    # return the intersection over union value
+    return iou
+
 
 class VideoChecker(object):
     def __init__(self, directory):
@@ -80,6 +104,7 @@ class VideoChecker(object):
             length = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
             pbar = tqdm(total=length + 1)
             check_interval = 1
+            prevbb = im_p.faces[0].box_m
             while cap.isOpened():
                 ret, frame = cap.read()
                 if not ret:
@@ -114,7 +139,13 @@ class VideoChecker(object):
                         break
                 else:
                     cur_v = im_p.faces[0]
-
+                curbb = cur_v.box_m
+                if bb_intersection_over_union(curbb, prevbb)<= 0: 
+                    print(f"[ERROR] Can't find speaker face on image ! Lost speaker!")
+                    correctFile = False
+                    break
+                prevbb = curbb
+          
                 frames.append(cv2.resize(cur_v.imgCv2, (256, 256))[:, :, ::-1])
 #                 im_p.showBoxes()
                 # im_p.parsedImage.save(f"./{file}_sample.jpg")
