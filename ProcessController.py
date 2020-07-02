@@ -15,7 +15,7 @@ from utils import load_checkpoints
 # noinspection PyBroadException
 class ProcessController(object):
 
-    def __init__(self, loadList="LoadList.csv", trimInterval=10):
+    def __init__(self, loadList="LoadList.csv", trimInterval=20):
         self.loadListPath = loadList
         self.loadList = pd.read_csv(loadList)
         self.interval = trimInterval
