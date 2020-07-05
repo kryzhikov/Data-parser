@@ -56,7 +56,7 @@ class ProcessController(object):
             if path.count(".mp4") == 0:
                 check_dir = path
                 videoChecker = VideoChecker(check_dir)
-                videoChecker.check(fa, device, model, KP_d=None)
+                videoChecker.check(fa, device, None, KP_d=None)
 
     def process(self):
 
