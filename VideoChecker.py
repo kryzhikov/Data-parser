@@ -84,7 +84,7 @@ class VideoChecker(object):
                 os.remove(self.directory + "/" + file)
                 continue
             else:
-                #prev_v = im_p.faces[0].getVector()
+                prev_v = None
 
             #             im_p.faces[0].faceImage.save(self.directory + "/" + file[:-4] + "/" + str(0) + ".jpg")
             im_p.showBoxes()
