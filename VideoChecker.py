@@ -84,7 +84,7 @@ class VideoChecker(object):
                 os.remove(self.directory + "/" + file)
                 continue
             else:
-                prev_v = im_p.faces[0].getVector()
+                prev_v = None
 
             #             im_p.faces[0].faceImage.save(self.directory + "/" + file[:-4] + "/" + str(0) + ".jpg")
             im_p.showBoxes()
@@ -103,7 +103,7 @@ class VideoChecker(object):
             idx = 1
             length = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
             pbar = tqdm(total=length + 1)
-            check_interval = 40 
+            check_interval = 1e10
             prevbb = im_p.faces[0].box_m
             
             ''' diff '''
@@ -241,5 +241,5 @@ class VideoChecker(object):
             print("CORRECT?", correctFile)
             print("FNAME", file)
             cap.release()
-            del prev_v
+            #del prev_v
             

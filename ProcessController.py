@@ -44,7 +44,7 @@ class ProcessController(object):
     @staticmethod
     def checkAll(rawVideoDir="./dataset/video/raw/"):
         device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
-        model = InceptionResnetV1(pretrained='vggface2').eval()
+        #model = InceptionResnetV1(pretrained='vggface2').eval()
         device_str = 'cpu' if device == torch.device('cpu') else 'cuda:0'
 #         kp_detector = load_checkpoints(config_path='/content/Data-parser/vox-256.yaml',
 #                             checkpoint_path='/content/gdrive/My Drive/first-order-motion-model/vox-cpk.pth.tar')
@@ -56,7 +56,7 @@ class ProcessController(object):
             if path.count(".mp4") == 0:
                 check_dir = path
                 videoChecker = VideoChecker(check_dir)
-                videoChecker.check(fa, device, model, KP_d=None)
+                videoChecker.check(fa, device, None, KP_d=None)
 
     def process(self):
 
