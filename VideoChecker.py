@@ -105,119 +105,72 @@ class VideoChecker(object):
             pbar = tqdm(total=length + 1)
             check_interval = 1e10
             prevbb = im_p.faces[0].box_m
-            
-            ''' diff '''
-            print('\n##### Start pre-checking #####')
-            prechecker_freq = 25
-            is_correct_video = True
-            video_length = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
-            for frame_idx in range(0, video_length, prechecker_freq):
-                cap.set(1, frame_idx)
+            while cap.isOpened():
                 ret, frame = cap.read()
-                
-                # check video
                 if not ret:
                     print("BROKEN VIDEO not ret")
                     break
                 
-                # check what? (???)
                 try:
                     im_p = ParsableImage(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB), device, file, face_al=fa, KP_d=KP_d)
-                    im_p.parseFaces(margin=60, model=model)       
+                    if idx % check_interval == 0:
+                        im_p.parseFaces(margin=60, model=model)
+                    else:
+                        im_p.parseFaces(margin=60, model=None)
+                        
                 except Exception as ex:
                     print(f"[ERROR] Can't find faces on image  Cant Parse cause of {ex}")
                     im_p.PILImage.save(f"{file}WHAT?.jpg")
                     correctFile = False
                     break
-                    
-                # check face)
+
                 if len(im_p.faces) == 0:
                     print(f"[ERROR] Can't find faces on image ! No faces")
                     correctFile = False
                     break
-         
-                # check speaker
-                cur_v = find_face_on_image(im_p.faces, prev_v, im_p.PILImage, file)
-                if cur_v is None:
-                    print(f"[ERROR] Can't find speaker face on image ! Speaker not found")
+                if idx % check_interval == 0:
+                    
+                
+                    cur_v = find_face_on_image(im_p.faces, prev_v, im_p.PILImage, file)
+
+                    if cur_v is None:
+                        print(f"[ERROR] Can't find speaker face on image ! Speaker not found")
+                        correctFile = False
+                        break
+                else:
+                    cur_v = im_p.faces[0]
+                curbb = cur_v.box_m
+                if bb_intersection_over_union(curbb, prevbb)<= 0: 
+                    print(f"[ERROR] Can't find speaker face on image ! Lost speaker!")
                     correctFile = False
                     break
+                prevbb = curbb
+          
+                frames.append(cv2.resize(cur_v.imgCv2, (256, 256))[:, :, ::-1])
+#                 im_p.showBoxes()
+                # im_p.parsedImage.save(f"./{file}_sample.jpg")
+                #                 np.save(self.directory + "/" + file[:-4] + "/2D" + str(idx), cur_v.lms2d)
+                #                 np.save(self.directory + "/" + file[:-4] + "/3D" + str(idx), cur_v.lms3d)
+                dres2.append(cur_v.lms2d)
+                dres3.append(cur_v.lms3d)
+                BB.append(cur_v.box_m)
+                #                 torch.save(cur_v.kp_source, self.directory + "/" + file[:-4] + "/KP_D" + str(idx))
+#                 KP_D.append(cur_v.kp_source)
+
+                if debug:
+                    tmp = cur_v.faceImage.copy()
+                    imageD = ImageDraw.Draw(tmp)
+                    for (x, y) in cur_v.dlibs_m:
+                        # print(x, y)
+                        imageD.point((x, y), 'green')
+                    tmp.save("DEBUG" + file.rstrip(".mp4") + ".jpg")
+               
+                if idx % check_interval == 0:
+                    im_p.flush()
+                idx += 1
                 del cur_v
-            print('##### Finish pre-checking #####')
-            # set start frame to zero
-            cap.set(1, 0)
-            ''' end diff '''
-                
-                
-            if correctFile: # diff
-                while cap.isOpened():
-                    ret, frame = cap.read()
-                    if not ret:
-                        print("BROKEN VIDEO not ret")
-                        break
-
-                    try:
-                        im_p = ParsableImage(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB), device, file, face_al=fa, KP_d=KP_d)
-                        if idx % check_interval == 0:
-                            im_p.parseFaces(margin=60, model=model)
-                        else:
-                            im_p.parseFaces(margin=60, model=None)
-
-                    except Exception as ex:
-                        print(f"[ERROR] Can't find faces on image  Cant Parse cause of {ex}")
-                        im_p.PILImage.save(f"{file}WHAT?.jpg")
-                        correctFile = False
-                        break
-
-                    if len(im_p.faces) == 0:
-                        print(f"[ERROR] Can't find faces on image ! No faces")
-                        correctFile = False
-                        break
-                    if idx % check_interval == 0:
-
-
-                        cur_v = find_face_on_image(im_p.faces, prev_v, im_p.PILImage, file)
-
-                        if cur_v is None:
-                            print(f"[ERROR] Can't find speaker face on image ! Speaker not found")
-                            correctFile = False
-                            break
-                    else:
-                        cur_v = im_p.faces[0]
-
-
-                    curbb = cur_v.box_m
-                    if bb_intersection_over_union(curbb, prevbb)<= 0: 
-                        print(f"[ERROR] Can't find speaker face on image ! Lost speaker!")
-                        correctFile = False
-                        break
-                    prevbb = curbb
-
-                    frames.append(cv2.resize(cur_v.imgCv2, (256, 256))[:, :, ::-1])
-    #                 im_p.showBoxes()
-                    # im_p.parsedImage.save(f"./{file}_sample.jpg")
-                    #                 np.save(self.directory + "/" + file[:-4] + "/2D" + str(idx), cur_v.lms2d)
-                    #                 np.save(self.directory + "/" + file[:-4] + "/3D" + str(idx), cur_v.lms3d)
-                    dres2.append(cur_v.lms2d)
-                    dres3.append(cur_v.lms3d)
-                    BB.append(cur_v.box_m)
-                    #                 torch.save(cur_v.kp_source, self.directory + "/" + file[:-4] + "/KP_D" + str(idx))
-    #                 KP_D.append(cur_v.kp_source)
-
-                    if debug:
-                        tmp = cur_v.faceImage.copy()
-                        imageD = ImageDraw.Draw(tmp)
-                        for (x, y) in cur_v.dlibs_m:
-                            # print(x, y)
-                            imageD.point((x, y), 'green')
-                        tmp.save("DEBUG" + file.rstrip(".mp4") + ".jpg")
-
-                    if idx % check_interval == 0:
-                        im_p.flush()
-                    idx += 1
-                    del cur_v
-                    # dump_tensors()
-                    pbar.update(1)
+                # dump_tensors()
+                pbar.update(1)
             pbar.close()
 #             torch.save(KP_D, self.directory + "/" + file[:-4] + "/KP_D.pt")
 #             print(np.array(frames).shape)
