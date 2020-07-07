@@ -113,10 +113,10 @@ class VideoChecker(object):
                 
                 try:
                     im_p = ParsableImage(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB), device, file, face_al=fa, KP_d=KP_d)
-                    if idx % check_interval == 0:
-                        im_p.parseFaces(margin=60, model=model)
-                    else:
-                        im_p.parseFaces(margin=60, model=None)
+#                     if idx % check_interval == 0:
+#                         im_p.parseFaces(margin=60, model=model)
+#                     else:
+                    im_p.parseFaces(margin=60, model=None)
                         
                 except Exception as ex:
                     print(f"[ERROR] Can't find faces on image  Cant Parse cause of {ex}")
@@ -128,17 +128,17 @@ class VideoChecker(object):
                     print(f"[ERROR] Can't find faces on image ! No faces")
                     correctFile = False
                     break
-                if idx % check_interval == 0:
+#                 if idx % check_interval == 0:
                     
                 
-                    cur_v = find_face_on_image(im_p.faces, prev_v, im_p.PILImage, file)
+#                     cur_v = find_face_on_image(im_p.faces, prev_v, im_p.PILImage, file)
 
-                    if cur_v is None:
-                        print(f"[ERROR] Can't find speaker face on image ! Speaker not found")
-                        correctFile = False
-                        break
-                else:
-                    cur_v = im_p.faces[0]
+#                     if cur_v is None:
+#                         print(f"[ERROR] Can't find speaker face on image ! Speaker not found")
+#                         correctFile = False
+#                         break
+#                 else:
+                cur_v = im_p.faces[0]
                 curbb = cur_v.box_m
                 if bb_intersection_over_union(curbb, prevbb)<= 0: 
                     print(f"[ERROR] Can't find speaker face on image ! Lost speaker!")
@@ -169,28 +169,16 @@ class VideoChecker(object):
                     im_p.flush()
                 idx += 1
                 del cur_v
-                # dump_tensors()
                 pbar.update(1)
             pbar.close()
-#             torch.save(KP_D, self.directory + "/" + file[:-4] + "/KP_D.pt")
-#             print(np.array(frames).shape)
-#             fourcc = VideoWriter_fourcc(*'MP42')
-#             video = VideoWriter(self.directory + "/" + file[:-4] + "/speaker.avi", fourcc, float(25), (256, 256))
-#             for i in frames:
-#                   video.write(i[:, :, ::-1])
-#             video.release()
-            #skvideo.io.vwrite(self.directory + "/" + file[:-4] + "/video.mp4", np.array(frames))
+
             if not correctFile:
                 os.remove(self.directory + "/" + file)
-                #os.remove(self.directory + "/" + file[:-4]+".txt")
 
             else:
                 np.save(self.directory + "/" + file[:-4] + "_2DFull.npy", np.array(dres2))
                 np.save(self.directory + "/" + file[:-4] + "_3DFull.npy", np.array(dres3))
-        #             np.save(self.directory + "/" + file[:-4] + "/frames.npy", np.array(frames))
                 np.save(self.directory + "/" + file[:-4] + "_BB.npy", np.array(BB))
-        #             shutil.copyfile(self.directory + "/" + file[:-4]+".txt", self.directory + "/" + file[:-4]+"/subs.txt")
-        #             shutil.copyfile(self.directory + "/" + file, self.directory + "/" + file[:-4]+"/speaket.mp4")
             print("CORRECT?", correctFile)
             print("FNAME", file)
             cap.release()
