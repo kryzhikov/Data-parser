@@ -2,7 +2,7 @@ import shutil
 
 import cv2
 from tqdm import tqdm
-
+import shutil 
 from ffe import *
 import skvideo.io
 from cv2 import VideoWriter, VideoWriter_fourcc
@@ -56,11 +56,11 @@ class VideoChecker(object):
             if ".DS_Store" in file or ".mp4" not in file:
                 continue
 #             f_dir = self.directory + "/" + file[:-4] + "/"
-            if os.path.exists(self.directory + "/" + file[:-4]+"_2DFull.npy"):
+            if os.path.exists(self.directory + "/" + file[:-4] + "/"):
                 print("file already checked!")
                 continue
-#             if not os.path.exists(self.directory + "/" + file[:-4] + "/"):
-#                 os.mkdir(self.directory + "/" + file[:-4] + "/")
+            if not os.path.exists(self.directory + "/" + file[:-4] + "/"):
+                os.mkdir(self.directory + "/" + file[:-4] + "/")
 
             correctFile = True
             cap = cv2.VideoCapture(self.directory + "/" + file)
@@ -144,16 +144,16 @@ class VideoChecker(object):
                     print(f"[ERROR] Can't find speaker face on image ! Lost speaker!")
                     correctFile = False
                     break
+                numb = '{:06}'.format(idx) 
+                print(numb)
+                im_p.PILImage.save(self.directory + "/" + file[:-4] + f"/im_{numb}.jpg")
                 prevbb = curbb
-          
                 frames.append(cv2.resize(cur_v.imgCv2, (256, 256))[:, :, ::-1])
 #                 im_p.showBoxes()
                 # im_p.parsedImage.save(f"./{file}_sample.jpg")
                 #                 np.save(self.directory + "/" + file[:-4] + "/2D" + str(idx), cur_v.lms2d)
                 #                 np.save(self.directory + "/" + file[:-4] + "/3D" + str(idx), cur_v.lms3d)
-                dres2.append(cur_v.lms2d)
-                dres3.append(cur_v.lms3d)
-                BB.append(cur_v.box_m)
+
                 #                 torch.save(cur_v.kp_source, self.directory + "/" + file[:-4] + "/KP_D" + str(idx))
 #                 KP_D.append(cur_v.kp_source)
 
@@ -173,14 +173,14 @@ class VideoChecker(object):
             pbar.close()
 
             if not correctFile:
-                os.remove(self.directory + "/" + file)
+                shutil.rmtree(self.directory + "/" + file[:-4])
 
-            else:
-                np.save(self.directory + "/" + file[:-4] + "_2DFull.npy", np.array(dres2))
-                np.save(self.directory + "/" + file[:-4] + "_3DFull.npy", np.array(dres3))
-                np.save(self.directory + "/" + file[:-4] + "_BB.npy", np.array(BB))
+#             else:
+#                 np.save(self.directory + "/" + file[:-4] + "_2DFull.npy", np.array(dres2))
+#                 np.save(self.directory + "/" + file[:-4] + "_3DFull.npy", np.array(dres3))
+#                 np.save(self.directory + "/" + file[:-4] + "_BB.npy", np.array(BB))
             print("CORRECT?", correctFile)
-            print("FNAME", file)
+            print(self.directory + "/" + file[:-4])
             cap.release()
             #del prev_v
             
