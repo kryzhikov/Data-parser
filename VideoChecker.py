@@ -68,6 +68,7 @@ class VideoChecker(object):
             if not ret:
                 print("BROKEN VIDEO not ret")
                 os.remove(self.directory + "/" + file)
+                shutil.rmtree(self.directory + "/" + file[:-4])
                 continue
             try:
                 im = Image.fromarray(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB))
@@ -77,11 +78,13 @@ class VideoChecker(object):
             except Exception as ex:
                 print("BROKEN VIDEO cant read imge ", ex)
                 os.remove(self.directory + "/" + file)
+                shutil.rmtree(self.directory + "/" + file[:-4])
                 continue
 
             if im_p.faces is None or len(im_p.faces) == 0 or len(im_p.faces) > 1:
                 print(f"[ERROR] Can't find faces on image !")
                 os.remove(self.directory + "/" + file)
+                shutil.rmtree(self.directory + "/" + file[:-4])
                 continue
             else:
                 prev_v = None
