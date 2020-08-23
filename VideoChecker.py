@@ -177,6 +177,7 @@ class VideoChecker(object):
 
             if not correctFile:
                 shutil.rmtree(self.directory + "/" + file[:-4])
+                os.remove(self.directory + "/" + file)
 
 #             else:
 #                 np.save(self.directory + "/" + file[:-4] + "_2DFull.npy", np.array(dres2))
