@@ -103,7 +103,9 @@ class VideoChecker(object):
             #             torch.save(im_p.faces[0].kp_source, self.directory + "/" + file[:-4] + "/KP_D" + str(0))
 #             KP_D.append(im_p.faces[0].kp_source)
             BB.append(im_p.faces[0].box_m)
-            im_p.PILImage.save(self.directory + "/" + file[:-4] + f"/im_{0}.jpg")
+            numb = '{:06}'.format(0) 
+
+            im_p.PILImage.save(self.directory + "/" + file[:-4] + f"/im_{numb}.jpg")
 
             idx = 1
             length = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
