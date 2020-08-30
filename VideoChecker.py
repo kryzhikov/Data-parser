@@ -61,6 +61,7 @@ class VideoChecker(object):
                 continue
             if not os.path.exists(self.directory + "/" + file[:-4] + "/"):
                 os.mkdir(self.directory + "/" + file[:-4] + "/")
+                os.mkdir(self.directory + "/" + file[:-4] + "/" + "images")
 
             correctFile = True
             cap = cv2.VideoCapture(self.directory + "/" + file)
@@ -105,7 +106,7 @@ class VideoChecker(object):
             BB.append(im_p.faces[0].box_m)
             numb = '{:06}'.format(0) 
 
-            im_p.PILImage.save(self.directory + "/" + file[:-4] + f"/im_{numb}.jpg")
+            im_p.PILImage.save(self.directory + "/" + file[:-4] + f"/images/{file[:-4]}_{numb}.jpg")
 
             idx = 1
             length = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
@@ -153,7 +154,7 @@ class VideoChecker(object):
                     break
                 numb = '{:06}'.format(idx) 
                 print(numb)
-                im_p.PILImage.save(self.directory + "/" + file[:-4] + f"/im_{numb}.jpg")
+                im_p.PILImage.save(self.directory + "/" + file[:-4] + f"/images/{file[:-4]}_{numb}.jpg")
                 prevbb = curbb
                 frames.append(cv2.resize(cur_v.imgCv2, (256, 256))[:, :, ::-1])
 #                 im_p.showBoxes()
