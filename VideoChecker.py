@@ -179,7 +179,8 @@ class VideoChecker(object):
                 del cur_v
                 pbar.update(1)
             pbar.close()
-
+            np.save(self.directory + "/" + file[:-4] + "/BB.npy", np.array(BB))
+            np.save(self.directory + "/" + file[:-4] + "/3DFull.npy", np.array(dres3))
             if not correctFile:
                 shutil.rmtree(self.directory + "/" + file[:-4])
                 os.remove(self.directory + "/" + file)
