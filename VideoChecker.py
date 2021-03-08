@@ -121,9 +121,6 @@ class VideoChecker(object):
                 
                 try:
                     im_p = ParsableImage(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB), device, file, face_al=fa, KP_d=KP_d)
-#                     if idx % check_interval == 0:
-#                         im_p.parseFaces(margin=60, model=model)
-#                     else:
                     im_p.parseFaces(margin=60, model=None)
                         
                 except Exception as ex:
@@ -136,16 +133,6 @@ class VideoChecker(object):
                     print(f"[ERROR] Can't find faces on image ! No faces")
                     correctFile = False
                     break
-#                 if idx % check_interval == 0:
-                    
-                
-#                     cur_v = find_face_on_image(im_p.faces, prev_v, im_p.PILImage, file)
-
-#                     if cur_v is None:
-#                         print(f"[ERROR] Can't find speaker face on image ! Speaker not found")
-#                         correctFile = False
-#                         break
-#                 else:
                 cur_v = im_p.faces[0]
                 curbb = cur_v.box_m
                 if bb_intersection_over_union(curbb, prevbb)<= 0: 
@@ -156,15 +143,9 @@ class VideoChecker(object):
                 print(numb)
                 im_p.PILImage.save(self.directory + "/" + file[:-4] + f"/images/{file[:-4]}_{numb}.jpg")
                 prevbb = curbb
-                frames.append(cv2.resize(cur_v.imgCv2, (256, 256))[:, :, ::-1])
-#                 im_p.showBoxes()
-                # im_p.parsedImage.save(f"./{file}_sample.jpg")
-                #                 np.save(self.directory + "/" + file[:-4] + "/2D" + str(idx), cur_v.lms2d)
-                #                 np.save(self.directory + "/" + file[:-4] + "/3D" + str(idx), cur_v.lms3d)
-
-                #                 torch.save(cur_v.kp_source, self.directory + "/" + file[:-4] + "/KP_D" + str(idx))
-#                 KP_D.append(cur_v.kp_source)
-
+                dres3.append(im_p.faces[0].lms3d)
+                BB.append(curbb)
+#                 frames.append(cv2.resize(cur_v.imgCv2, (256, 256))[:, :, ::-1])
                 if debug:
                     tmp = cur_v.faceImage.copy()
                     imageD = ImageDraw.Draw(tmp)
@@ -184,13 +165,7 @@ class VideoChecker(object):
             if not correctFile:
                 shutil.rmtree(self.directory + "/" + file[:-4])
                 os.remove(self.directory + "/" + file)
-
-#             else:
-#                 np.save(self.directory + "/" + file[:-4] + "_2DFull.npy", np.array(dres2))
-#                 np.save(self.directory + "/" + file[:-4] + "_3DFull.npy", np.array(dres3))
-#                 np.save(self.directory + "/" + file[:-4] + "_BB.npy", np.array(BB))
             print("CORRECT?", correctFile)
             print(self.directory + "/" + file[:-4])
             cap.release()
-            #del prev_v
             
